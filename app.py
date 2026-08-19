@@ -1,24 +1,23 @@
+from datetime import timezone, datetime
+
 from flask import Flask, request, render_template, jsonify
 from flask_restful import Api
 
-from Models_psgr import BookModel
-from config import db_connection1
-from data_pr import test3
-from extensions import db
+from Model_sqlite import Workout, db
+from config import  Config
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = f'{db_connection1}'
+app.config.from_object(Config)
 db.init_app(app)
 
 api = Api(app)
-# db.create_all()
-
-# api.add_resource(Book, "/<int:pk>")
-
+with app.app_context():
+    db.create_all()
 
 '''templates start'''
 @app.route('/index.html')
 def index():
+
     return render_template("index.html")
 
 
@@ -29,7 +28,20 @@ def x5():
 @app.route('/workout/add',  methods=["POST"])
 def workout_add():
     data = request.get_json()
-    print(data)
+
+    workout = Workout(
+        date=data["date"],
+        time=data["time"],
+        sent_to_flask=True,
+        sent_at=datetime.now(timezone.utc),
+        data=data["data"]
+    )
+
+    db.session.add(workout)
+
+    db.session.commit()
+
+    print(workout)
 
     return jsonify({"status": "success"}), 200
 
