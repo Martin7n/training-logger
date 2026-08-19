@@ -1,12 +1,671 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Title</title>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Workouts</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            font-family: Arial, sans-serif;
+
+            max-width: 1200px;
+
+            margin: 0 auto;
+
+            padding: 20px;
+
+            background: #f3f3f3;
+
+            color: #222;
+        }
+
+
+        h1 {
+
+            margin-top: 5px;
+
+            margin-bottom: 25px;
+        }
+
+
+        /* ==================================================
+           WORKOUT GRID
+           ================================================== */
+
+        .workouts {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(320px, 1fr)
+                );
+
+            gap: 15px;
+
+            margin-top: 20px;
+        }
+
+
+        /* ==================================================
+           WORKOUT CARD
+           ================================================== */
+
+        .workout-card {
+
+            background: white;
+
+            border-radius: 12px;
+
+            padding: 18px;
+
+            box-shadow:
+                0 3px 10px
+                rgba(0, 0, 0, 0.08);
+        }
+
+
+        /* ==================================================
+           WORKOUT HEADER
+           ================================================== */
+
+        .workout-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 15px;
+
+            padding-bottom: 12px;
+
+            border-bottom:
+                1px solid #eee;
+        }
+
+
+        .workout-title {
+
+            font-size: 18px;
+
+            font-weight: bold;
+        }
+
+
+        .workout-date {
+
+            color: #777;
+
+            font-size: 13px;
+
+            text-align: right;
+        }
+
+
+        /* ==================================================
+           EXERCISE
+           ================================================== */
+
+        .exercise {
+
+            margin-bottom: 18px;
+
+            padding-bottom: 14px;
+
+            border-bottom:
+                1px solid #f0f0f0;
+        }
+
+
+        .exercise:last-child {
+
+            margin-bottom: 0;
+
+            padding-bottom: 0;
+
+            border-bottom: none;
+        }
+
+
+        .exercise-name {
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            color: #2c3e50;
+
+            margin-bottom: 6px;
+        }
+
+
+        .exercise-notes {
+
+            font-size: 13px;
+
+            color: #777;
+
+            margin-bottom: 8px;
+        }
+
+
+        /* ==================================================
+           SETS TABLE
+           ================================================== */
+
+        .sets-table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+        }
+
+
+        .sets-table th {
+
+            text-align: left;
+
+            font-size: 12px;
+
+            color: #888;
+
+            font-weight: normal;
+
+            padding: 5px 8px;
+
+            border-bottom:
+                1px solid #eee;
+        }
+
+
+        .sets-table td {
+
+            padding: 6px 8px;
+
+            border-bottom:
+                1px solid #f1f1f1;
+        }
+
+
+        .sets-table tr:last-child td {
+
+            border-bottom: none;
+        }
+
+
+        .set-number {
+
+            color: #999;
+
+            width: 50px;
+        }
+
+
+        .weight {
+
+            font-weight: bold;
+        }
+
+
+        .reps {
+
+            font-weight: bold;
+        }
+
+
+        /* ==================================================
+           STATUS
+           ================================================== */
+
+        .workout-status {
+
+            margin-top: 15px;
+
+            padding-top: 10px;
+
+            border-top:
+                1px solid #eee;
+
+            font-size: 13px;
+        }
+
+
+        .sent {
+
+            color: #27ae60;
+
+            font-weight: bold;
+        }
+
+
+        .not-sent {
+
+            color: #e67e22;
+
+            font-weight: bold;
+        }
+
+
+        /* ==================================================
+           EMPTY
+           ================================================== */
+
+        .empty {
+
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 12px;
+
+            text-align: center;
+
+            color: #777;
+        }
+
+
+        /* ==================================================
+           MOBILE
+           ================================================== */
+
+        @media (max-width: 700px) {
+
+            body {
+
+                padding: 15px;
+            }
+
+
+            .workouts {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            .workout-card {
+
+                padding: 15px;
+            }
+
+
+            .workout-header {
+
+                align-items: flex-start;
+
+                gap: 10px;
+            }
+
+        }
+
+
+        @media (max-width: 450px) {
+
+            body {
+
+                padding: 10px;
+            }
+
+
+            .workout-header {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+            }
+
+
+            .workout-date {
+
+                text-align: left;
+            }
+
+
+            .sets-table th,
+            .sets-table td {
+
+                padding: 6px;
+            }
+
+        }
+
+    </style>
+
 </head>
+
+
 <body>
 
-<h1>It workz!</h1>
+
+<h1>
+    🏋️ Workouts
+</h1>
+
+
+{% if data %}
+
+
+<div class="workouts">
+
+
+    {% for workout in data %}
+
+
+    <!-- ==================================================
+         WORKOUT CARD
+         ================================================== -->
+
+    <div class="workout-card">
+
+
+        <!-- ==================================================
+             WORKOUT HEADER
+             ================================================== -->
+
+        <div class="workout-header">
+
+
+            <div class="workout-title">
+
+                Workout #{{ workout.id }}
+
+            </div>
+
+
+            <div class="workout-date">
+
+                {{ workout.date }}
+
+                <br>
+
+                {{ workout.time }}
+
+            </div>
+
+
+        </div>
+
+
+        <!-- ==================================================
+             EXERCISES
+
+             workout.data is now a LIST.
+
+             Example:
+
+             [
+                 {
+                     "name": "Deadlift",
+                     "notes": "",
+                     "sets": [...]
+                 },
+                 {
+                     "name": "Deadlift",
+                     "notes": "",
+                     "sets": [...]
+                 }
+             ]
+
+             Duplicate exercises are therefore allowed.
+             ================================================== -->
+
+        {% if workout.data %}
+
+
+            {% for exercise in workout.data %}
+
+
+            <div class="exercise">
+
+
+                <!-- ==================================================
+                     EXERCISE NAME
+                     ================================================== -->
+
+                <div class="exercise-name">
+
+                    {{ exercise.name }}
+
+                </div>
+
+
+                <!-- ==================================================
+                     NOTES
+                     ================================================== -->
+
+                {% if exercise.notes %}
+
+                <div class="exercise-notes">
+
+                    {{ exercise.notes }}
+
+                </div>
+
+                {% endif %}
+
+
+                <!-- ==================================================
+                     SETS
+                     ================================================== -->
+
+                {% if exercise.sets %}
+
+
+                <table class="sets-table">
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Set
+                            </th>
+
+                            <th>
+                                Weight
+                            </th>
+
+                            <th>
+                                Reps
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+
+                        {% for set in exercise.sets %}
+
+
+                        {% if
+                            set.weight is not none
+                            or
+                            set.reps is not none
+                        %}
+
+
+                        <tr>
+
+
+                            <td class="set-number">
+
+                                {{ loop.index }}
+
+                            </td>
+
+
+                            <td class="weight">
+
+                                {% if set.weight is not none %}
+
+                                    {{ set.weight }} kg
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td class="reps">
+
+                                {% if set.reps is not none %}
+
+                                    {{ set.reps }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                        </tr>
+
+
+                        {% endif %}
+
+
+                        {% endfor %}
+
+
+                    </tbody>
+
+
+                </table>
+
+
+                {% else %}
+
+
+                <div class="exercise-notes">
+
+                    No sets recorded.
+
+                </div>
+
+
+                {% endif %}
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+        {% else %}
+
+
+        <div class="empty">
+
+            No exercise data.
+
+        </div>
+
+
+        {% endif %}
+
+
+        <!-- ==================================================
+             FLASK STATUS
+             ================================================== -->
+
+        <div class="workout-status">
+
+
+            {% if workout.sent_to_flask %}
+
+
+                <span class="sent">
+
+                    ✓ Sent to Flask
+
+                </span>
+
+
+            {% else %}
+
+
+                <span class="not-sent">
+
+                    ⚠ Not sent to Flask
+
+                </span>
+
+
+            {% endif %}
+
+
+            &nbsp;·&nbsp;
+
+
+            {% if workout.sent_at %}
+
+                {{ workout.sent_at }}
+
+            {% else %}
+
+                Not sent yet
+
+            {% endif %}
+
+
+        </div>
+
+
+    </div>
+
+
+    {% endfor %}
+
+
+</div>
+
+
+{% else %}
+
+
+<!-- ==================================================
+     NO WORKOUTS
+     ================================================== -->
+
+<div class="empty">
+
+    No workouts saved yet.
+
+</div>
+
+
+{% endif %}
+
 
 </body>
+
 </html>

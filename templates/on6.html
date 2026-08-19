@@ -1317,6 +1317,16 @@ function readSets(
 
 // ==========================================================
 // READ ONE EXERCISE
+//
+// IMPORTANT:
+// Exercise name is now stored as a normal property,
+// NOT as an object key.
+//
+// This allows duplicate exercises:
+//
+// Deadlift
+// Deadlift
+// Press
 // ==========================================================
 
 function readExercise(
@@ -1337,6 +1347,10 @@ function readExercise(
 
     return {
 
+        name:
+            select.value,
+
+
         notes:
             notes.value.trim(),
 
@@ -1354,18 +1368,29 @@ function readExercise(
 // READ CURRENT WORKOUT
 //
 // IMPORTANT:
-// Exercise name becomes the object key.
+// Workout data is an ARRAY.
 //
-// Instead of:
+// This means duplicate exercises are allowed.
 //
-// exercise1
-// exercise2
+// Example:
 //
-// we produce:
-//
-// Squat
-// Press
-// Deadlift
+// [
+//     {
+//         name: "Deadlift",
+//         notes: "",
+//         sets: [...]
+//     },
+//     {
+//         name: "Deadlift",
+//         notes: "",
+//         sets: [...]
+//     },
+//     {
+//         name: "Press",
+//         notes: "",
+//         sets: [...]
+//     }
+// ]
 // ==========================================================
 
 function readCurrentWorkout() {
@@ -1376,49 +1401,24 @@ function readCurrentWorkout() {
         );
 
 
-    const workout = {};
+    const workout = [];
 
 
-    for (
-        const exercise of exerciseElements
-    ) {
+    exerciseElements.forEach(
+        exercise => {
 
-        const select =
-            exercise.querySelector(
-                ".exercise-select"
+            const exerciseData =
+                readExercise(
+                    exercise
+                );
+
+
+            workout.push(
+                exerciseData
             );
 
-
-        const exerciseName =
-            select.value;
-
-
-        // --------------------------------------------------
-        // Prevent duplicate exercise names.
-        //
-        // Because the exercise name is now the key,
-        // two identical names would overwrite each other.
-        // --------------------------------------------------
-
-        if (
-            workout.hasOwnProperty(
-                exerciseName
-            )
-        ) {
-
-            throw new Error(
-                `Exercise "${exerciseName}" was added more than once.`
-            );
         }
-
-
-        workout[
-            exerciseName
-        ] =
-            readExercise(
-                exercise
-            );
-    }
+    );
 
 
     return workout;
@@ -1497,14 +1497,10 @@ async function sendToFlask(
 // ==========================================================
 // SAVE WORKOUT
 //
-// IMPORTANT ORDER:
-//
 // 1. Read form
 // 2. Save to LocalStorage
 // 3. Try Flask
 // 4. Update LocalStorage with send result
-//
-// LocalStorage ALWAYS comes first.
 // ==========================================================
 
 async function saveWorkout() {
@@ -1533,10 +1529,13 @@ async function saveWorkout() {
     }
 
 
+    // ------------------------------------------------------
+    // IMPORTANT:
+//     workoutData is an ARRAY now.
+// ------------------------------------------------------
+
     const exerciseCount =
-        Object.keys(
-            workoutData
-        ).length;
+        workoutData.length;
 
 
     if (
@@ -1623,9 +1622,7 @@ async function saveWorkout() {
 
 
     // ------------------------------------------------------
-    // Clear form immediately after local save.
-    //
-    // The workout is safe at this point.
+    // Clear form immediately after local save
     // ------------------------------------------------------
 
     currentWorkout.innerHTML =
@@ -1980,10 +1977,20 @@ function renderSavedWorkouts() {
                     "workout-info";
 
 
+                // --------------------------------------------------
+                // DATA IS AN ARRAY
+                //
+                // Therefore we use .map()
+                // instead of Object.keys()
+                // --------------------------------------------------
+
                 const exerciseNames =
-                    workout.data
-                        ? Object.keys(
-                            workout.data
+                    Array.isArray(
+                        workout.data
+                    )
+                        ? workout.data.map(
+                            exercise =>
+                                exercise.name
                         )
                         : [];
 
@@ -2170,8 +2177,7 @@ function renderSavedWorkouts() {
 // ==========================================================
 // EXPORT JSON
 //
-// Exports EXACTLY what is currently in LocalStorage,
-// wrapped in a small file-format object.
+// Exports exactly what is currently in LocalStorage.
 // ==========================================================
 
 function exportJSON() {
@@ -2194,10 +2200,6 @@ function exportJSON() {
     }
 
 
-    // ------------------------------------------------------
-    // Export object
-    // ------------------------------------------------------
-
     const exportData = {
 
         version:
@@ -2215,10 +2217,6 @@ function exportJSON() {
     };
 
 
-    // ------------------------------------------------------
-    // JSON
-    // ------------------------------------------------------
-
     const json =
         JSON.stringify(
             exportData,
@@ -2226,10 +2224,6 @@ function exportJSON() {
             4
         );
 
-
-    // ------------------------------------------------------
-    // Blob
-    // ------------------------------------------------------
 
     const blob =
         new Blob(
@@ -2246,10 +2240,6 @@ function exportJSON() {
             blob
         );
 
-
-    // ------------------------------------------------------
-    // Filename
-    // ------------------------------------------------------
 
     const date =
         getLocalDate();
@@ -2269,10 +2259,6 @@ function exportJSON() {
     const filename =
         `workouts-${date}-${time}.json`;
 
-
-    // ------------------------------------------------------
-    // Download
-    // ------------------------------------------------------
 
     const link =
         document.createElement(
@@ -2304,11 +2290,6 @@ function exportJSON() {
         link
     );
 
-
-    // ------------------------------------------------------
-    // Give browser time to start download
-    // before releasing object URL.
-    // ------------------------------------------------------
 
     setTimeout(
         function () {
@@ -2357,7 +2338,7 @@ function importJSON(
                 //
                 // { workouts: [...] }
                 //
-                // or directly:
+                // or:
                 //
                 // [...]
                 // --------------------------------------------------
@@ -2401,7 +2382,9 @@ function importJSON(
                         workout =>
                             !workout ||
                             workout.id === undefined ||
-                            !workout.data
+                            !Array.isArray(
+                                workout.data
+                            )
                     )
                 ) {
 
@@ -2504,8 +2487,9 @@ function importJSON(
                             );
 
 
-                            // Make sure synchronization
-                            // properties exist.
+                            // --------------------------------------------------
+                            // Make sure synchronization properties exist
+                            // --------------------------------------------------
 
                             if (
                                 workout.sentToFlask ===
@@ -2722,8 +2706,7 @@ fileInput.addEventListener(
         );
 
 
-        // Allow selecting
-        // the same file again.
+        // Allow selecting the same file again.
 
         fileInput.value =
             "";

@@ -15,10 +15,15 @@ with app.app_context():
     db.create_all()
 
 '''templates start'''
-@app.route('/index.html')
+@app.route('/')
 def index():
 
-    return render_template("index.html")
+    workout = Workout.query.all()
+
+
+    return render_template('index.html', data=workout)
+
+    # return render_template("index.html")
 
 
 @app.route('/x5')
