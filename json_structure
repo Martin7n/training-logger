@@ -1,0 +1,39 @@
+Workout
+│
+├── id
+├── date
+├── time
+├── sentToFlask
+├── sentAt
+│
+└── data
+     │
+     ├── Deadlift
+     │    ├── notes
+     │    └── sets
+     │         ├── set 1 → 100 × 5
+     │         ├── set 2 → 120 × 4
+     │         └── set 3 → 150 × 3
+     │
+     └── CleanPress
+          ├── notes
+          └── sets
+               ├── set 1 → 90 × 5
+               ├── set 2 → 100 × 4
+               └── set 3 → 110 × 3
+
+Example:
+    {   'id': 4, 'date': '2026-08-19',
+        'time': '17:26:28',
+        'sentToFlask': False,
+        'sentAt': None,
+
+            'data': {
+                'Deadlift': {'notes': '', 'sets': [{'weight': 100, 'reps': 5},
+                        {'weight': 120, 'reps': 4}, {'weight': 150, 'reps': 3}]},
+                        'CleanPress': {'notes': '', 'sets': [{'weight': 90, 'reps': 5},
+                        {'weight': 100, 'reps': 4}, {'weight': 110, 'reps': 3}]
+                        }
+                     }
+
+    }

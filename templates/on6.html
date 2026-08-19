@@ -1,0 +1,2767 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Workout Logger</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+
+            font-family: Arial, sans-serif;
+
+            max-width: 1000px;
+
+            margin: 0 auto;
+
+            padding: 15px;
+
+            background: #f3f3f3;
+
+            color: #222;
+        }
+
+        h1 {
+            margin-top: 5px;
+        }
+
+        h2 {
+            margin-top: 30px;
+        }
+
+        button {
+
+            border: none;
+
+            border-radius: 7px;
+
+            padding: 10px 15px;
+
+            font-size: 15px;
+
+            cursor: pointer;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+
+            opacity: 0.5;
+
+            cursor: default;
+        }
+
+        .toolbar {
+
+            background: white;
+
+            padding: 15px;
+
+            border-radius: 10px;
+
+            margin-bottom: 15px;
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 8px;
+        }
+
+        .toolbar button {
+
+            background: #3498db;
+
+            color: white;
+        }
+
+        .toolbar .green {
+
+            background: #27ae60;
+        }
+
+        .toolbar .purple {
+
+            background: #8e44ad;
+        }
+
+        .toolbar .danger {
+
+            background: #e74c3c;
+        }
+
+        .controls {
+
+            background: white;
+
+            padding: 15px;
+
+            border-radius: 10px;
+
+            margin-bottom: 20px;
+        }
+
+        .control-row {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+            align-items: end;
+        }
+
+        .control {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 5px;
+        }
+
+        label {
+
+            font-weight: bold;
+
+            font-size: 14px;
+        }
+
+        select,
+        input {
+
+            padding: 9px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 6px;
+
+            font-size: 15px;
+
+            background: white;
+        }
+
+        #addExerciseBtn {
+
+            background: #2ecc71;
+
+            color: white;
+        }
+
+        .exercise {
+
+            background: white;
+
+            border-radius: 10px;
+
+            padding: 15px;
+
+            margin-bottom: 15px;
+
+            box-shadow:
+                0 2px 5px rgba(0, 0, 0, 0.08);
+        }
+
+        .exercise-header {
+
+            display: grid;
+
+            grid-template-columns:
+                40px
+                minmax(150px, 220px)
+                1fr
+                auto;
+
+            gap: 10px;
+
+            align-items: center;
+
+            margin-bottom: 12px;
+        }
+
+        .exercise-number {
+
+            font-weight: bold;
+
+            color: #555;
+        }
+
+        .exercise-select {
+
+            width: 100%;
+        }
+
+        .notes {
+
+            width: 100%;
+        }
+
+        .remove-exercise {
+
+            background: #e74c3c;
+
+            color: white;
+
+            padding: 8px 10px;
+
+            font-size: 13px;
+        }
+
+        .sets {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(6, 1fr);
+
+            gap: 8px;
+        }
+
+        .set {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 5px;
+        }
+
+        .set-number {
+
+            color: #777;
+
+            font-size: 12px;
+        }
+
+        .weight,
+        .reps {
+
+            width: 100%;
+        }
+
+        #saveWorkoutBtn {
+
+            background: #3498db;
+
+            color: white;
+
+            margin-top: 5px;
+
+            margin-bottom: 20px;
+        }
+
+        #status {
+
+            padding: 10px;
+
+            border-radius: 7px;
+
+            margin-bottom: 15px;
+
+            display: none;
+        }
+
+        #status.info {
+
+            display: block;
+
+            background: #d6eaf8;
+
+            color: #21618c;
+        }
+
+        #status.success {
+
+            display: block;
+
+            background: #d5f5e3;
+
+            color: #1e8449;
+        }
+
+        #status.warning {
+
+            display: block;
+
+            background: #fcf3cf;
+
+            color: #9a7d0a;
+        }
+
+        #status.error {
+
+            display: block;
+
+            background: #fadbd8;
+
+            color: #922b21;
+        }
+
+        .saved-workout {
+
+            background: white;
+
+            border-radius: 9px;
+
+            padding: 12px 15px;
+
+            margin-bottom: 8px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 10px;
+        }
+
+        .workout-info {
+
+            line-height: 1.5;
+        }
+
+        .sent {
+
+            color: #27ae60;
+
+            font-weight: bold;
+        }
+
+        .not-sent {
+
+            color: #e67e22;
+
+            font-weight: bold;
+        }
+
+        .workout-buttons {
+
+            display: flex;
+
+            gap: 5px;
+
+            flex-wrap: wrap;
+        }
+
+        .send-btn {
+
+            background: #3498db;
+
+            color: white;
+
+            padding: 7px 10px;
+
+            font-size: 13px;
+        }
+
+        .delete-btn {
+
+            background: #e74c3c;
+
+            color: white;
+
+            padding: 7px 10px;
+
+            font-size: 13px;
+        }
+
+        .empty {
+
+            background: white;
+
+            padding: 20px;
+
+            border-radius: 9px;
+
+            color: #777;
+
+            text-align: center;
+        }
+
+        .small {
+
+            font-size: 13px;
+
+            color: #777;
+        }
+
+        .exercise-summary {
+
+            margin-top: 5px;
+
+            color: #555;
+
+            font-size: 14px;
+        }
+
+        @media (max-width: 700px) {
+
+            .sets {
+
+                grid-template-columns:
+                    repeat(3, 1fr);
+            }
+
+            .exercise-header {
+
+                grid-template-columns:
+                    35px
+                    1fr
+                    auto;
+            }
+
+            .exercise-header .notes {
+
+                grid-column:
+                    2 / 4;
+            }
+        }
+
+        @media (max-width: 400px) {
+
+            .sets {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            body {
+
+                padding: 10px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<h1>🏋️ Workout Logger</h1>
+
+
+<!-- ====================================================== -->
+<!-- TOOLBAR -->
+<!-- ====================================================== -->
+
+<div class="toolbar">
+
+    <button
+        id="exportBtn"
+        class="green"
+    >
+        💾 Export JSON
+    </button>
+
+
+    <button
+        id="importBtn"
+        class="purple"
+    >
+        📂 Import JSON
+    </button>
+
+
+    <button
+        id="clearBtn"
+        class="danger"
+    >
+        🗑️ Clear Local Storage
+    </button>
+
+
+    <input
+        type="file"
+        id="fileInput"
+        accept=".json,application/json"
+        style="display:none"
+    >
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- CURRENT WORKOUT -->
+<!-- ====================================================== -->
+
+<div class="controls">
+
+    <div class="control-row">
+
+        <div class="control">
+
+            <button id="addExerciseBtn">
+                ➕ Add Exercise
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div id="currentWorkout"></div>
+
+
+<button
+    id="saveWorkoutBtn"
+>
+    💾 Save Workout
+</button>
+
+
+<!-- ====================================================== -->
+<!-- STATUS -->
+<!-- ====================================================== -->
+
+<div id="status"></div>
+
+
+<!-- ====================================================== -->
+<!-- SAVED WORKOUTS -->
+<!-- ====================================================== -->
+
+<h2>
+    Saved Workouts
+</h2>
+
+
+<div id="savedWorkouts"></div>
+
+
+<script>
+
+
+// ==========================================================
+// CONFIGURATION
+// ==========================================================
+
+const STORAGE_KEY =
+    "workoutLog";
+
+
+const FILE_VERSION =
+    1;
+
+
+// ==========================================================
+// EXERCISES
+// ==========================================================
+
+const EXERCISES = [
+
+    "Deadlift",
+    "Press",
+    "Squat",
+    "Pullup",
+    "Incline Bench",
+    "Bench",
+    "Dip",
+    "SideLat",
+    "Row",
+    "French EZ",
+    "PressDB",
+    "Curl Ez",
+    "CleanPress",
+    "Front Squat",
+    "Pushup",
+    "Curl DB-hammer",
+    "BPA",
+    "Incline",
+    "Extension"
+
+];
+
+
+// ==========================================================
+// ELEMENTS
+// ==========================================================
+
+const addExerciseBtn =
+    document.getElementById(
+        "addExerciseBtn"
+    );
+
+
+const saveWorkoutBtn =
+    document.getElementById(
+        "saveWorkoutBtn"
+    );
+
+
+const exportBtn =
+    document.getElementById(
+        "exportBtn"
+    );
+
+
+const importBtn =
+    document.getElementById(
+        "importBtn"
+    );
+
+
+const clearBtn =
+    document.getElementById(
+        "clearBtn"
+    );
+
+
+const fileInput =
+    document.getElementById(
+        "fileInput"
+    );
+
+
+const currentWorkout =
+    document.getElementById(
+        "currentWorkout"
+    );
+
+
+const savedWorkouts =
+    document.getElementById(
+        "savedWorkouts"
+    );
+
+
+const status =
+    document.getElementById(
+        "status"
+    );
+
+
+// ==========================================================
+// STATUS
+// ==========================================================
+
+function showStatus(
+    message,
+    type
+) {
+
+    status.textContent =
+        message;
+
+    status.className =
+        type;
+}
+
+
+// ==========================================================
+// LOCAL DATE
+// ==========================================================
+
+function getLocalDate() {
+
+    return new Date()
+        .toLocaleDateString(
+            "sv-SE"
+        );
+}
+
+
+// ==========================================================
+// LOCAL TIME
+// ==========================================================
+
+function getLocalTime() {
+
+    return new Date()
+        .toLocaleTimeString(
+            "en-GB"
+        );
+}
+
+
+// ==========================================================
+// GET LOCAL WORKOUTS
+// ==========================================================
+
+function getLocalWorkouts() {
+
+    const data =
+        localStorage.getItem(
+            STORAGE_KEY
+        );
+
+
+    if (!data) {
+
+        return [];
+    }
+
+
+    try {
+
+        const parsed =
+            JSON.parse(data);
+
+
+        if (
+            !Array.isArray(parsed)
+        ) {
+
+            console.warn(
+                "Local workout data is not an array."
+            );
+
+            return [];
+        }
+
+
+        return parsed;
+
+    } catch (error) {
+
+        console.error(
+            "Could not read localStorage:",
+            error
+        );
+
+
+        showStatus(
+            "Could not read workout data from local storage.",
+            "error"
+        );
+
+
+        return [];
+    }
+}
+
+
+// ==========================================================
+// SAVE LOCAL WORKOUTS
+// ==========================================================
+
+function saveLocalWorkouts(
+    workouts
+) {
+
+    try {
+
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(
+                workouts
+            )
+        );
+
+
+        return true;
+
+    } catch (error) {
+
+        console.error(
+            "Could not save to localStorage:",
+            error
+        );
+
+
+        showStatus(
+            "Could not save workout to local storage.",
+            "error"
+        );
+
+
+        return false;
+    }
+}
+
+
+// ==========================================================
+// NEXT WORKOUT ID
+// ==========================================================
+
+function getNextWorkoutId() {
+
+    const workouts =
+        getLocalWorkouts();
+
+
+    if (
+        workouts.length === 0
+    ) {
+
+        return 1;
+    }
+
+
+    const ids =
+        workouts.map(
+            workout =>
+                Number(
+                    workout.id
+                ) || 0
+        );
+
+
+    return Math.max(
+        ...ids
+    ) + 1;
+}
+
+
+// ==========================================================
+// CREATE EXERCISE SELECT
+// ==========================================================
+
+function createExerciseSelect() {
+
+    const select =
+        document.createElement(
+            "select"
+        );
+
+
+    select.className =
+        "exercise-select";
+
+
+    EXERCISES.forEach(
+        exercise => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                exercise;
+
+
+            option.textContent =
+                exercise;
+
+
+            select.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    return select;
+}
+
+
+// ==========================================================
+// CREATE REPS SELECT
+// ==========================================================
+
+function createRepsSelect() {
+
+    const select =
+        document.createElement(
+            "select"
+        );
+
+
+    select.className =
+        "reps";
+
+
+    const blank =
+        document.createElement(
+            "option"
+        );
+
+
+    blank.value =
+        "";
+
+
+    blank.textContent =
+        "-";
+
+
+    select.appendChild(
+        blank
+    );
+
+
+    for (
+        let i = 1;
+        i <= 25;
+        i++
+    ) {
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+
+        option.value =
+            i;
+
+
+        option.textContent =
+            i;
+
+
+        select.appendChild(
+            option
+        );
+    }
+
+
+    return select;
+}
+
+
+// ==========================================================
+// CREATE SIX SETS
+// ==========================================================
+
+function createSets() {
+
+    const sets =
+        document.createElement(
+            "div"
+        );
+
+
+    sets.className =
+        "sets";
+
+
+    for (
+        let i = 1;
+        i <= 6;
+        i++
+    ) {
+
+        const set =
+            document.createElement(
+                "div"
+            );
+
+
+        set.className =
+            "set";
+
+
+        const setNumber =
+            document.createElement(
+                "div"
+            );
+
+
+        setNumber.className =
+            "set-number";
+
+
+        setNumber.textContent =
+            `Set ${i}`;
+
+
+        // --------------------------------------------------
+        // WEIGHT
+        // --------------------------------------------------
+
+        const weight =
+            document.createElement(
+                "input"
+            );
+
+
+        weight.type =
+            "number";
+
+
+        weight.step =
+            "0.1";
+
+
+        weight.min =
+            "0";
+
+
+        weight.placeholder =
+            "kg";
+
+
+        weight.className =
+            "weight";
+
+
+        // --------------------------------------------------
+        // REPS
+        // --------------------------------------------------
+
+        const reps =
+            createRepsSelect();
+
+
+        set.appendChild(
+            setNumber
+        );
+
+
+        set.appendChild(
+            weight
+        );
+
+
+        set.appendChild(
+            reps
+        );
+
+
+        sets.appendChild(
+            set
+        );
+
+    }
+
+
+    return sets;
+}
+
+
+// ==========================================================
+// CREATE ONE EXERCISE
+// ==========================================================
+
+function createExercise() {
+
+    const exercise =
+        document.createElement(
+            "div"
+        );
+
+
+    exercise.className =
+        "exercise";
+
+
+    // ------------------------------------------------------
+    // HEADER
+    // ------------------------------------------------------
+
+    const header =
+        document.createElement(
+            "div"
+        );
+
+
+    header.className =
+        "exercise-header";
+
+
+    // ------------------------------------------------------
+    // NUMBER
+    // ------------------------------------------------------
+
+    const number =
+        document.createElement(
+            "div"
+        );
+
+
+    number.className =
+        "exercise-number";
+
+
+    // ------------------------------------------------------
+    // EXERCISE NAME
+    // ------------------------------------------------------
+
+    const select =
+        createExerciseSelect();
+
+
+    // ------------------------------------------------------
+    // NOTES
+    // ------------------------------------------------------
+
+    const notes =
+        document.createElement(
+            "input"
+        );
+
+
+    notes.type =
+        "text";
+
+
+    notes.className =
+        "notes";
+
+
+    notes.placeholder =
+        "Notes...";
+
+
+    // ------------------------------------------------------
+    // REMOVE
+    // ------------------------------------------------------
+
+    const remove =
+        document.createElement(
+            "button"
+        );
+
+
+    remove.className =
+        "remove-exercise";
+
+
+    remove.textContent =
+        "Remove";
+
+
+    remove.addEventListener(
+        "click",
+        function () {
+
+            exercise.remove();
+
+            renumberExercises();
+
+        }
+    );
+
+
+    header.appendChild(
+        number
+    );
+
+
+    header.appendChild(
+        select
+    );
+
+
+    header.appendChild(
+        notes
+    );
+
+
+    header.appendChild(
+        remove
+    );
+
+
+    exercise.appendChild(
+        header
+    );
+
+
+    exercise.appendChild(
+        createSets()
+    );
+
+
+    return exercise;
+}
+
+
+// ==========================================================
+// RENUMBER EXERCISES
+// ==========================================================
+
+function renumberExercises() {
+
+    const exercises =
+        currentWorkout.querySelectorAll(
+            ".exercise"
+        );
+
+
+    exercises.forEach(
+        (
+            exercise,
+            index
+        ) => {
+
+            const number =
+                exercise.querySelector(
+                    ".exercise-number"
+                );
+
+
+            number.textContent =
+                `#${index + 1}`;
+
+        }
+    );
+}
+
+
+// ==========================================================
+// ADD EXERCISE
+// ==========================================================
+
+function addExercise() {
+
+    const exercise =
+        createExercise();
+
+
+    currentWorkout.appendChild(
+        exercise
+    );
+
+
+    renumberExercises();
+
+
+    exercise.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
+}
+
+
+// ==========================================================
+// READ SETS
+// ==========================================================
+
+function readSets(
+    exercise
+) {
+
+    const weights =
+        exercise.querySelectorAll(
+            ".weight"
+        );
+
+
+    const reps =
+        exercise.querySelectorAll(
+            ".reps"
+        );
+
+
+    const sets = [];
+
+
+    for (
+        let i = 0;
+        i < 6;
+        i++
+    ) {
+
+        const weightValue =
+            weights[i].value.trim();
+
+
+        const repsValue =
+            reps[i].value;
+
+
+        // --------------------------------------------------
+        // Ignore completely empty sets
+        // --------------------------------------------------
+
+        if (
+            weightValue === "" &&
+            repsValue === ""
+        ) {
+
+            continue;
+        }
+
+
+        sets.push({
+
+            weight:
+                weightValue === ""
+                    ? null
+                    : parseFloat(
+                        weightValue
+                    ),
+
+
+            reps:
+                repsValue === ""
+                    ? null
+                    : parseInt(
+                        repsValue,
+                        10
+                    )
+
+        });
+
+    }
+
+
+    return sets;
+}
+
+
+// ==========================================================
+// READ ONE EXERCISE
+// ==========================================================
+
+function readExercise(
+    exercise
+) {
+
+    const select =
+        exercise.querySelector(
+            ".exercise-select"
+        );
+
+
+    const notes =
+        exercise.querySelector(
+            ".notes"
+        );
+
+
+    return {
+
+        notes:
+            notes.value.trim(),
+
+
+        sets:
+            readSets(
+                exercise
+            )
+
+    };
+}
+
+
+// ==========================================================
+// READ CURRENT WORKOUT
+//
+// IMPORTANT:
+// Exercise name becomes the object key.
+//
+// Instead of:
+//
+// exercise1
+// exercise2
+//
+// we produce:
+//
+// Squat
+// Press
+// Deadlift
+// ==========================================================
+
+function readCurrentWorkout() {
+
+    const exerciseElements =
+        currentWorkout.querySelectorAll(
+            ".exercise"
+        );
+
+
+    const workout = {};
+
+
+    for (
+        const exercise of exerciseElements
+    ) {
+
+        const select =
+            exercise.querySelector(
+                ".exercise-select"
+            );
+
+
+        const exerciseName =
+            select.value;
+
+
+        // --------------------------------------------------
+        // Prevent duplicate exercise names.
+        //
+        // Because the exercise name is now the key,
+        // two identical names would overwrite each other.
+        // --------------------------------------------------
+
+        if (
+            workout.hasOwnProperty(
+                exerciseName
+            )
+        ) {
+
+            throw new Error(
+                `Exercise "${exerciseName}" was added more than once.`
+            );
+        }
+
+
+        workout[
+            exerciseName
+        ] =
+            readExercise(
+                exercise
+            );
+    }
+
+
+    return workout;
+}
+
+
+// ==========================================================
+// SEND COMPLETE WORKOUT TO FLASK
+// ==========================================================
+
+async function sendToFlask(
+    workout
+) {
+
+    try {
+
+        const response =
+            await fetch(
+                "/workout/add",
+                {
+
+                    method:
+                        "POST",
+
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+
+                    body:
+                        JSON.stringify(
+                            workout
+                        )
+
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `HTTP ${response.status}`
+            );
+        }
+
+
+        const result =
+            await response.json();
+
+
+        console.log(
+            "Flask response:",
+            result
+        );
+
+
+        return true;
+
+    } catch (error) {
+
+        console.error(
+            "Could not send workout to Flask:",
+            error
+        );
+
+
+        return false;
+    }
+}
+
+
+// ==========================================================
+// SAVE WORKOUT
+//
+// IMPORTANT ORDER:
+//
+// 1. Read form
+// 2. Save to LocalStorage
+// 3. Try Flask
+// 4. Update LocalStorage with send result
+//
+// LocalStorage ALWAYS comes first.
+// ==========================================================
+
+async function saveWorkout() {
+
+    let workoutData;
+
+
+    // ------------------------------------------------------
+    // Read form
+    // ------------------------------------------------------
+
+    try {
+
+        workoutData =
+            readCurrentWorkout();
+
+    } catch (error) {
+
+        showStatus(
+            error.message,
+            "warning"
+        );
+
+
+        return;
+    }
+
+
+    const exerciseCount =
+        Object.keys(
+            workoutData
+        ).length;
+
+
+    if (
+        exerciseCount === 0
+    ) {
+
+        showStatus(
+            "Add at least one exercise first.",
+            "warning"
+        );
+
+
+        return;
+    }
+
+
+    // ------------------------------------------------------
+    // Create workout object
+    // ------------------------------------------------------
+
+    const workout = {
+
+        id:
+            getNextWorkoutId(),
+
+
+        date:
+            getLocalDate(),
+
+
+        time:
+            getLocalTime(),
+
+
+        sentToFlask:
+            false,
+
+
+        sentAt:
+            null,
+
+
+        data:
+            workoutData
+
+    };
+
+
+    // ------------------------------------------------------
+    // SAVE LOCALLY FIRST
+    // ------------------------------------------------------
+
+    const workouts =
+        getLocalWorkouts();
+
+
+    workouts.push(
+        workout
+    );
+
+
+    const saved =
+        saveLocalWorkouts(
+            workouts
+        );
+
+
+    if (!saved) {
+
+        showStatus(
+            "Workout could not be saved locally. It was NOT sent to Flask.",
+            "error"
+        );
+
+
+        return;
+    }
+
+
+    console.log(
+        "Workout saved locally:",
+        workout
+    );
+
+
+    // ------------------------------------------------------
+    // Clear form immediately after local save.
+    //
+    // The workout is safe at this point.
+    // ------------------------------------------------------
+
+    currentWorkout.innerHTML =
+        "";
+
+
+    // ------------------------------------------------------
+    // Send to Flask
+    // ------------------------------------------------------
+
+    showStatus(
+        `Workout #${workout.id} saved locally. Sending to Flask...`,
+        "info"
+    );
+
+
+    saveWorkoutBtn.disabled =
+        true;
+
+
+    const sent =
+        await sendToFlask(
+            workout
+        );
+
+
+    saveWorkoutBtn.disabled =
+        false;
+
+
+    // ------------------------------------------------------
+    // Update local synchronization status
+    // ------------------------------------------------------
+
+    const updatedWorkouts =
+        getLocalWorkouts();
+
+
+    const savedWorkout =
+        updatedWorkouts.find(
+            item =>
+                Number(item.id) ===
+                Number(workout.id)
+        );
+
+
+    if (savedWorkout) {
+
+        if (sent) {
+
+            savedWorkout.sentToFlask =
+                true;
+
+
+            savedWorkout.sentAt =
+                new Date()
+                    .toISOString();
+
+        } else {
+
+            savedWorkout.sentToFlask =
+                false;
+
+
+            savedWorkout.sentAt =
+                null;
+        }
+
+
+        saveLocalWorkouts(
+            updatedWorkouts
+        );
+    }
+
+
+    // ------------------------------------------------------
+    // Result
+    // ------------------------------------------------------
+
+    if (sent) {
+
+        showStatus(
+            `Workout #${workout.id} saved locally and sent to Flask ✓`,
+            "success"
+        );
+
+    } else {
+
+        showStatus(
+            `Workout #${workout.id} saved locally. Flask is unavailable — it can be sent later.`,
+            "warning"
+        );
+    }
+
+
+    renderSavedWorkouts();
+}
+
+
+// ==========================================================
+// RETRY SEND
+// ==========================================================
+
+async function retrySend(
+    workoutId
+) {
+
+    const workouts =
+        getLocalWorkouts();
+
+
+    const workout =
+        workouts.find(
+            item =>
+                Number(item.id) ===
+                Number(workoutId)
+        );
+
+
+    if (!workout) {
+
+        showStatus(
+            `Workout #${workoutId} was not found locally.`,
+            "error"
+        );
+
+
+        return;
+    }
+
+
+    // ------------------------------------------------------
+    // Find buttons
+    // ------------------------------------------------------
+
+    const buttons =
+        document.querySelectorAll(
+            `[data-send-id="${workoutId}"]`
+        );
+
+
+    buttons.forEach(
+        button => {
+
+            button.disabled =
+                true;
+
+
+            button.textContent =
+                "Sending...";
+
+        }
+    );
+
+
+    // ------------------------------------------------------
+    // Send
+    // ------------------------------------------------------
+
+    const sent =
+        await sendToFlask(
+            workout
+        );
+
+
+    // ------------------------------------------------------
+    // Update local record
+    // ------------------------------------------------------
+
+    if (sent) {
+
+        const current =
+            getLocalWorkouts();
+
+
+        const item =
+            current.find(
+                x =>
+                    Number(x.id) ===
+                    Number(workoutId)
+            );
+
+
+        if (item) {
+
+            item.sentToFlask =
+                true;
+
+
+            item.sentAt =
+                new Date()
+                    .toISOString();
+
+
+            saveLocalWorkouts(
+                current
+            );
+        }
+
+
+        showStatus(
+            `Workout #${workoutId} sent to Flask ✓`,
+            "success"
+        );
+
+
+    } else {
+
+        buttons.forEach(
+            button => {
+
+                button.disabled =
+                    false;
+
+
+                button.textContent =
+                    "Send";
+
+            }
+        );
+
+
+        showStatus(
+            `Could not send workout #${workoutId}. It remains safely stored locally.`,
+            "error"
+        );
+
+
+        return;
+    }
+
+
+    renderSavedWorkouts();
+}
+
+
+// ==========================================================
+// DELETE WORKOUT
+// ==========================================================
+
+function deleteWorkout(
+    workoutId
+) {
+
+    const confirmed =
+        confirm(
+            `Delete workout #${workoutId} from local storage?`
+        );
+
+
+    if (!confirmed) {
+
+        return;
+    }
+
+
+    const workouts =
+        getLocalWorkouts();
+
+
+    const filtered =
+        workouts.filter(
+            workout =>
+                Number(workout.id) !==
+                Number(workoutId)
+        );
+
+
+    saveLocalWorkouts(
+        filtered
+    );
+
+
+    renderSavedWorkouts();
+
+
+    showStatus(
+        `Workout #${workoutId} deleted from local storage.`,
+        "info"
+    );
+}
+
+
+// ==========================================================
+// RENDER SAVED WORKOUTS
+// ==========================================================
+
+function renderSavedWorkouts() {
+
+    const workouts =
+        getLocalWorkouts();
+
+
+    savedWorkouts.innerHTML =
+        "";
+
+
+    if (
+        workouts.length === 0
+    ) {
+
+        const empty =
+            document.createElement(
+                "div"
+            );
+
+
+        empty.className =
+            "empty";
+
+
+        empty.textContent =
+            "No workouts saved locally.";
+
+
+        savedWorkouts.appendChild(
+            empty
+        );
+
+
+        return;
+    }
+
+
+    // ------------------------------------------------------
+    // Newest first
+    // ------------------------------------------------------
+
+    workouts
+        .slice()
+        .reverse()
+        .forEach(
+            workout => {
+
+                const row =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                row.className =
+                    "saved-workout";
+
+
+                const info =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                info.className =
+                    "workout-info";
+
+
+                const exerciseNames =
+                    workout.data
+                        ? Object.keys(
+                            workout.data
+                        )
+                        : [];
+
+
+                const exerciseCount =
+                    exerciseNames.length;
+
+
+                const sentText =
+                    workout.sentToFlask
+                        ? "✓ Sent to Flask"
+                        : "⚠ Not sent to Flask";
+
+
+                const sentClass =
+                    workout.sentToFlask
+                        ? "sent"
+                        : "not-sent";
+
+
+                // --------------------------------------------------
+                // Exercise summary
+                // --------------------------------------------------
+
+                let summary = "";
+
+
+                if (
+                    exerciseNames.length > 0
+                ) {
+
+                    summary =
+                        exerciseNames.join(
+                            ", "
+                        );
+                }
+
+
+                info.innerHTML = `
+
+                    <strong>
+                        Workout #${workout.id}
+                    </strong>
+
+                    <br>
+
+                    ${workout.date}
+                    ${workout.time}
+
+                    <br>
+
+                    <span class="small">
+                        ${exerciseCount}
+                        exercise(s)
+                    </span>
+
+                    <br>
+
+                    <span class="exercise-summary">
+                        ${summary}
+                    </span>
+
+                    <br>
+
+                    <span class="${sentClass}">
+                        ${sentText}
+                    </span>
+
+                `;
+
+
+                // --------------------------------------------------
+                // Buttons
+                // --------------------------------------------------
+
+                const buttons =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                buttons.className =
+                    "workout-buttons";
+
+
+                // --------------------------------------------------
+                // SEND
+                // --------------------------------------------------
+
+                if (
+                    !workout.sentToFlask
+                ) {
+
+                    const sendButton =
+                        document.createElement(
+                            "button"
+                        );
+
+
+                    sendButton.className =
+                        "send-btn";
+
+
+                    sendButton.dataset.sendId =
+                        workout.id;
+
+
+                    sendButton.textContent =
+                        "Send";
+
+
+                    sendButton.addEventListener(
+                        "click",
+                        function () {
+
+                            retrySend(
+                                workout.id
+                            );
+
+                        }
+                    );
+
+
+                    buttons.appendChild(
+                        sendButton
+                    );
+                }
+
+
+                // --------------------------------------------------
+                // DELETE
+                // --------------------------------------------------
+
+                const deleteButton =
+                    document.createElement(
+                        "button"
+                    );
+
+
+                deleteButton.className =
+                    "delete-btn";
+
+
+                deleteButton.textContent =
+                    "Delete";
+
+
+                deleteButton.addEventListener(
+                    "click",
+                    function () {
+
+                        deleteWorkout(
+                            workout.id
+                        );
+
+                    }
+                );
+
+
+                buttons.appendChild(
+                    deleteButton
+                );
+
+
+                row.appendChild(
+                    info
+                );
+
+
+                row.appendChild(
+                    buttons
+                );
+
+
+                savedWorkouts.appendChild(
+                    row
+                );
+
+            }
+        );
+}
+
+
+// ==========================================================
+// EXPORT JSON
+//
+// Exports EXACTLY what is currently in LocalStorage,
+// wrapped in a small file-format object.
+// ==========================================================
+
+function exportJSON() {
+
+    const workouts =
+        getLocalWorkouts();
+
+
+    if (
+        workouts.length === 0
+    ) {
+
+        showStatus(
+            "There are no workouts in local storage to export.",
+            "warning"
+        );
+
+
+        return;
+    }
+
+
+    // ------------------------------------------------------
+    // Export object
+    // ------------------------------------------------------
+
+    const exportData = {
+
+        version:
+            FILE_VERSION,
+
+
+        exportedAt:
+            new Date()
+                .toISOString(),
+
+
+        workouts:
+            workouts
+
+    };
+
+
+    // ------------------------------------------------------
+    // JSON
+    // ------------------------------------------------------
+
+    const json =
+        JSON.stringify(
+            exportData,
+            null,
+            4
+        );
+
+
+    // ------------------------------------------------------
+    // Blob
+    // ------------------------------------------------------
+
+    const blob =
+        new Blob(
+            [json],
+            {
+                type:
+                    "application/json"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    // ------------------------------------------------------
+    // Filename
+    // ------------------------------------------------------
+
+    const date =
+        getLocalDate();
+
+
+    const time =
+        new Date()
+            .toLocaleTimeString(
+                "en-GB"
+            )
+            .replace(
+                /:/g,
+                "-"
+            );
+
+
+    const filename =
+        `workouts-${date}-${time}.json`;
+
+
+    // ------------------------------------------------------
+    // Download
+    // ------------------------------------------------------
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.href =
+        url;
+
+
+    link.download =
+        filename;
+
+
+    link.style.display =
+        "none";
+
+
+    document.body.appendChild(
+        link
+    );
+
+
+    link.click();
+
+
+    document.body.removeChild(
+        link
+    );
+
+
+    // ------------------------------------------------------
+    // Give browser time to start download
+    // before releasing object URL.
+    // ------------------------------------------------------
+
+    setTimeout(
+        function () {
+
+            URL.revokeObjectURL(
+                url
+            );
+
+        },
+        1000
+    );
+
+
+    showStatus(
+        `Exported ${workouts.length} workout(s) from local storage.`,
+        "success"
+    );
+}
+
+
+// ==========================================================
+// IMPORT JSON
+// ==========================================================
+
+function importJSON(
+    file
+) {
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload =
+        function () {
+
+            try {
+
+                const imported =
+                    JSON.parse(
+                        reader.result
+                    );
+
+
+                // --------------------------------------------------
+                // Accept either:
+                //
+                // { workouts: [...] }
+                //
+                // or directly:
+                //
+                // [...]
+                // --------------------------------------------------
+
+                let importedWorkouts;
+
+
+                if (
+                    Array.isArray(
+                        imported
+                    )
+                ) {
+
+                    importedWorkouts =
+                        imported;
+
+                } else if (
+                    imported &&
+                    Array.isArray(
+                        imported.workouts
+                    )
+                ) {
+
+                    importedWorkouts =
+                        imported.workouts;
+
+                } else {
+
+                    throw new Error(
+                        "Invalid workout JSON format."
+                    );
+                }
+
+
+                // --------------------------------------------------
+                // Basic validation
+                // --------------------------------------------------
+
+                if (
+                    importedWorkouts.some(
+                        workout =>
+                            !workout ||
+                            workout.id === undefined ||
+                            !workout.data
+                    )
+                ) {
+
+                    throw new Error(
+                        "One or more workouts are invalid."
+                    );
+                }
+
+
+                // --------------------------------------------------
+                // Ask what to do
+                // --------------------------------------------------
+
+                const replace =
+                    confirm(
+                        "Replace all existing local workouts with the imported workouts?\n\nOK = Replace\nCancel = Merge"
+                    );
+
+
+                let finalWorkouts;
+
+
+                if (replace) {
+
+                    finalWorkouts =
+                        importedWorkouts;
+
+                } else {
+
+                    const existing =
+                        getLocalWorkouts();
+
+
+                    finalWorkouts =
+                        [
+                            ...existing,
+                            ...importedWorkouts
+                        ];
+                }
+
+
+                // --------------------------------------------------
+                // Fix duplicate IDs when merging
+                // --------------------------------------------------
+
+                const usedIds =
+                    new Set();
+
+
+                let nextId =
+                    finalWorkouts.reduce(
+                        (
+                            max,
+                            workout
+                        ) => {
+
+                            return Math.max(
+                                max,
+                                Number(
+                                    workout.id
+                                ) || 0
+                            );
+
+                        },
+                        0
+                    ) + 1;
+
+
+                finalWorkouts =
+                    finalWorkouts.map(
+                        workout => {
+
+                            const id =
+                                Number(
+                                    workout.id
+                                );
+
+
+                            if (
+                                usedIds.has(
+                                    id
+                                )
+                            ) {
+
+                                workout = {
+
+                                    ...workout,
+
+                                    id:
+                                        nextId++
+
+                                };
+                            }
+
+
+                            usedIds.add(
+                                Number(
+                                    workout.id
+                                )
+                            );
+
+
+                            // Make sure synchronization
+                            // properties exist.
+
+                            if (
+                                workout.sentToFlask ===
+                                undefined
+                            ) {
+
+                                workout.sentToFlask =
+                                    false;
+                            }
+
+
+                            if (
+                                workout.sentAt ===
+                                undefined
+                            ) {
+
+                                workout.sentAt =
+                                    null;
+                            }
+
+
+                            return workout;
+
+                        }
+                    );
+
+
+                // --------------------------------------------------
+                // Save
+                // --------------------------------------------------
+
+                const saved =
+                    saveLocalWorkouts(
+                        finalWorkouts
+                    );
+
+
+                if (!saved) {
+
+                    return;
+                }
+
+
+                renderSavedWorkouts();
+
+
+                showStatus(
+                    `Imported ${importedWorkouts.length} workout(s) successfully.`,
+                    "success"
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Import error:",
+                    error
+                );
+
+
+                showStatus(
+                    `Could not import JSON: ${error.message}`,
+                    "error"
+                );
+            }
+
+        };
+
+
+    reader.onerror =
+        function () {
+
+            showStatus(
+                "Could not read the selected file.",
+                "error"
+            );
+
+        };
+
+
+    reader.readAsText(
+        file
+    );
+}
+
+
+// ==========================================================
+// CLEAR LOCAL STORAGE
+// ==========================================================
+
+function clearLocalStorage() {
+
+    const workouts =
+        getLocalWorkouts();
+
+
+    if (
+        workouts.length === 0
+    ) {
+
+        showStatus(
+            "Local storage is already empty.",
+            "info"
+        );
+
+
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            `Delete all ${workouts.length} locally saved workout(s)?\n\nThis cannot be undone.\n\nExport them first if you want a backup.`
+        );
+
+
+    if (!confirmed) {
+
+        return;
+    }
+
+
+    localStorage.removeItem(
+        STORAGE_KEY
+    );
+
+
+    renderSavedWorkouts();
+
+
+    showStatus(
+        "All local workouts have been deleted.",
+        "success"
+    );
+}
+
+
+// ==========================================================
+// ADD EXERCISE BUTTON
+// ==========================================================
+
+addExerciseBtn.addEventListener(
+    "click",
+    function () {
+
+        addExercise();
+
+    }
+);
+
+
+// ==========================================================
+// SAVE WORKOUT BUTTON
+// ==========================================================
+
+saveWorkoutBtn.addEventListener(
+    "click",
+    function () {
+
+        saveWorkout();
+
+    }
+);
+
+
+// ==========================================================
+// EXPORT BUTTON
+// ==========================================================
+
+exportBtn.addEventListener(
+    "click",
+    function () {
+
+        exportJSON();
+
+    }
+);
+
+
+// ==========================================================
+// IMPORT BUTTON
+// ==========================================================
+
+importBtn.addEventListener(
+    "click",
+    function () {
+
+        fileInput.click();
+
+    }
+);
+
+
+// ==========================================================
+// FILE INPUT
+// ==========================================================
+
+fileInput.addEventListener(
+    "change",
+    function () {
+
+        const file =
+            fileInput.files[0];
+
+
+        if (!file) {
+
+            return;
+        }
+
+
+        importJSON(
+            file
+        );
+
+
+        // Allow selecting
+        // the same file again.
+
+        fileInput.value =
+            "";
+
+    }
+);
+
+
+// ==========================================================
+// CLEAR BUTTON
+// ==========================================================
+
+clearBtn.addEventListener(
+    "click",
+    function () {
+
+        clearLocalStorage();
+
+    }
+);
+
+
+// ==========================================================
+// INITIAL LOAD
+// ==========================================================
+
+renderSavedWorkouts();
+
+
+// ==========================================================
+// START WITH ONE EXERCISE
+// ==========================================================
+
+addExercise();
+
+
+</script>
+
+</body>
+
+</html>
